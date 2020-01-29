@@ -6,6 +6,7 @@
         "moduleResolution": "Node",
         "sourceMap": true,
         "outDir": "dist",
+        "baseUrl": "./"
     },
     "include": [
         "src/**/*"

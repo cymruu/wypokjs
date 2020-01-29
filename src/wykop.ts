@@ -1,13 +1,13 @@
 import axios, { AxiosInstance } from 'axios'
 
-interface WykopAPIClientConfig {
-	apikey: string
+export interface WykopAPIClientConfig {
+	appkey: string
 	secret: string
 	host?: string
 	timeout?: number
 	userAgent?: string
 }
-type namedParamsT = { [key: string]: string }
+export type namedParamsT = { [key: string]: string }
 interface WykopRequestParams {
 	apiParam: string,
 	namedParams: namedParamsT
@@ -27,13 +27,13 @@ export class Wykop {
 		this._http = axios.create()
 		this.configureHttpClient()
 	}
+	static namedParamsToString(namedParams: namedParamsT) {
+		return `${Object.entries(namedParams).map(x => x.join('/')).join('/')}/`
+	}
 	private configureHttpClient() {
 		this._http.defaults.timeout = this.config.timeout
 		this._http.defaults.baseURL = new URL(`https://${this.config.host}`).toString()
 		this._http.defaults.headers.common['User-Agent'] = this.config.userAgent
-	}
-	static namedParamsToString(namedParams: namedParamsT){
-		return Object.entries(namedParams).join('/')
 	}
 	private makeQueryPath(endpoint: string, { apiParam, namedParams }: WykopRequestParams) {
 		return `${endpoint}/${apiParam}/${Wykop.namedParamsToString(namedParams)}`
