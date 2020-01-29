@@ -7,9 +7,10 @@ interface WykopAPIClientConfig {
 	timeout?: number
 	userAgent?: string
 }
+type namedParamsT = { [key: string]: string }
 interface WykopRequestParams {
 	apiParam: string,
-	namedParams: { [key: string]: string }
+	namedParams: namedParamsT
 	postParams: any
 }
 const defaultClientConfig = {
@@ -31,11 +32,13 @@ export class Wykop {
 		this._http.defaults.baseURL = new URL(`https://${this.config.host}`).toString()
 		this._http.defaults.headers.common['User-Agent'] = this.config.userAgent
 	}
-	private makeQueryPath(endpoint: string, {apiParam, namedParams}: WykopRequestParams) {
-		//todo make Object.entries work with typescript
-		return `${endpoint}/${apiParam}/`
+	static namedParamsToString(namedParams: namedParamsT){
+		return Object.entries(namedParams).join('/')
+	}
+	private makeQueryPath(endpoint: string, { apiParam, namedParams }: WykopRequestParams) {
+		return `${endpoint}/${apiParam}/${Wykop.namedParamsToString(namedParams)}`
 	}
 	public makeRequest(endpoint: string, params: WykopRequestParams) {
-		axios.get(endpoint)
+		axios.get(this.makeQueryPath(endpoint, params))
 	}
 }
