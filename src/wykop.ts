@@ -28,7 +28,8 @@ export class Wykop {
 		this.configureHttpClient()
 	}
 	static namedParamsToString(namedParams: namedParamsT) {
-		return `${Object.entries(namedParams).filter(([_, value]) => value).map(x => x.join('/')).join('/')}/`
+		return Object.entries(namedParams).filter(([, key]) => key)
+			.reduce((p, [key, value]) => `${p}${key}/${value}/`, '')
 	}
 	private configureHttpClient() {
 		this._http.defaults.timeout = this.config.timeout
