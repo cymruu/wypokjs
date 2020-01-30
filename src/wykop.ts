@@ -13,7 +13,7 @@ interface WykopRequestParams {
 	namedParams: namedParamsT
 	postParams: any
 }
-const defaultClientConfig = {
+export const defaultClientConfig = {
 	userAgent: 'wypokJS/0.0.1',
 	host: 'a2.wykop.pl',
 	timeout: 5000,

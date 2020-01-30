@@ -1,4 +1,5 @@
-import { Wykop, namedParamsT } from './wykop'
+import { Wykop, namedParamsT, defaultClientConfig } from './wykop'
+import { testConfig, createTestClient } from './testUtils/testConfig'
 
 describe('wykop class tests', () => {
 	describe('namedParamsToString method', () => {
@@ -15,6 +16,18 @@ describe('wykop class tests', () => {
 				secret: undefined,
 			}
 			expect(Wykop.namedParamsToString(params)).toEqual('appkey/appkeyValue/')
+		})
+	})
+	describe('wykop client tests', () => {
+		let client: Wykop
+		beforeEach(() => {
+			client = createTestClient(testConfig)
+		})
+		it('config should have set fields and defaults one', () => {
+			expect((client as any).config).toEqual({ ...defaultClientConfig, ...testConfig })
+		})
+		it('request', () => {
+			client.makeRequest('/', { apiParam: '1', namedParams: {}, postParams: {} })
 		})
 	})
 })

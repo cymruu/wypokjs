@@ -5,4 +5,5 @@ module.exports = {
 		'/node_modules/'
 	],
 	testEnvironment: 'node',
+	modulePaths: ['<rootDir>'],
 }
