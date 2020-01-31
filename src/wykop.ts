@@ -1,4 +1,6 @@
-import axios, { AxiosInstance } from 'axios'
+import axios, { AxiosInstance, AxiosResponse } from 'axios'
+import { createHash } from 'crypto'
+import { promises, resolve } from 'dns'
 
 export interface WykopAPIClientConfig {
 	appkey: string
@@ -9,9 +11,14 @@ export interface WykopAPIClientConfig {
 }
 export type namedParamsT = { [key: string]: string }
 interface WykopRequestParams {
-	apiParam: string,
-	namedParams: namedParamsT
-	postParams: any
+	apiParam?: string,
+	namedParams?: namedParamsT
+	postParams?: any
+}
+const emptyRequestParmas: WykopRequestParams = {
+	apiParam: '',
+	namedParams: Object.create(null),
+	postParams: Object.create(null),
 }
 export const defaultClientConfig = {
 	userAgent: 'wypokJS/0.0.1',
@@ -22,8 +29,10 @@ export const defaultClientConfig = {
 export class Wykop {
 	private config: WykopAPIClientConfig
 	private _http: AxiosInstance
+	private _baseUrl:string
 	constructor(config: WykopAPIClientConfig) {
 		this.config = { ...defaultClientConfig, ...config }
+		this._baseUrl = new URL(`https://${this.config.host}`).toString()
 		this._http = axios.create()
 		this.configureHttpClient()
 	}
@@ -33,13 +42,43 @@ export class Wykop {
 	}
 	private configureHttpClient() {
 		this._http.defaults.timeout = this.config.timeout
-		this._http.defaults.baseURL = new URL(`https://${this.config.host}`).toString()
 		this._http.defaults.headers.common['User-Agent'] = this.config.userAgent
 	}
-	private makeQueryPath(endpoint: string, { apiParam, namedParams }: WykopRequestParams) {
-		return `${endpoint}/${apiParam}/${Wykop.namedParamsToString(namedParams)}`
+	private buildUrl(endpoint: string, { apiParam, namedParams }: WykopRequestParams): URL {
+		if (endpoint.charAt(0) === '/') {endpoint = endpoint.substr(1)}
+		if (endpoint.charAt(endpoint.length - 1) === '/') { endpoint = endpoint.substring(0, endpoint.length - 1)}
+		return new URL(
+			`${endpoint}/${apiParam}${apiParam ? '/' : ''}${Wykop.namedParamsToString(namedParams)}`, this._baseUrl,
+		)
 	}
-	public makeRequest(endpoint: string, params: WykopRequestParams) {
-		axios.get(this.makeQueryPath(endpoint, params))
+	private signRequest(url: URL, { postParams }: WykopRequestParams) {
+		const signData = `${this.config.secret}${url}`
+		if (postParams) {
+			//formBody | multiplalues(postParams).filter(v => v).join(',')
+		}
+		return createHash('md5').update(signData).digest('hex')
+	}
+	public async makeRequest(endpoint: string, params: WykopRequestParams = {}) {
+		params = { ...emptyRequestParmas, ...params }
+		return await this._http.request({
+			method: params.postParams ? 'POST' : 'GET',
+			url: this.buildUrl(endpoint, params).toString(),
+			data: params.postParams || undefined,
+			adapter: (config) => {
+				console.log('adapter ran')
+				console.log(config)
+				return new Promise((resolve, reject) => {
+					const respone:AxiosResponse = {
+						config: config,
+						data: [1, 2, 3],
+						headers: [],
+						status: 200,
+						request: {},
+						statusText: 'OK',
+					}
+					resolve(respone)
+				})
+			},
+		})
 	}
 }
