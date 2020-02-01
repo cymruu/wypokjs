@@ -54,31 +54,16 @@ export class Wykop {
 	private signRequest(url: URL, { postParams }: WykopRequestParams) {
 		const signData = `${this.config.secret}${url}`
 		if (postParams) {
-			//formBody | multiplalues(postParams).filter(v => v).join(',')
+			//formBody | multipart
 		}
 		return createHash('md5').update(signData).digest('hex')
 	}
-	public async makeRequest(endpoint: string, params: WykopRequestParams = {}) {
+	public makeRequest(endpoint: string, params: WykopRequestParams = {}) {
 		params = { ...emptyRequestParmas, ...params }
-		return await this._http.request({
+		return this._http.request({
 			method: params.postParams ? 'POST' : 'GET',
 			url: this.buildUrl(endpoint, params).toString(),
 			data: params.postParams || undefined,
-			adapter: (config) => {
-				console.log('adapter ran')
-				console.log(config)
-				return new Promise((resolve, reject) => {
-					const respone:AxiosResponse = {
-						config: config,
-						data: [1, 2, 3],
-						headers: [],
-						status: 200,
-						request: {},
-						statusText: 'OK',
-					}
-					resolve(respone)
-				})
-			},
 		})
 	}
 }

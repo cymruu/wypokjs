@@ -1,5 +1,8 @@
 import { Wykop, namedParamsT, defaultClientConfig } from './wykop'
 import { testConfig, createTestClient } from './testUtils/testConfig'
+import nock from 'nock'
+import httpAdapter from 'axios/lib/adapters/http'
+import Axios from 'axios'
 
 describe('wykop class tests', () => {
 	describe('namedParamsToString method', () => {
@@ -22,13 +25,20 @@ describe('wykop class tests', () => {
 		let client: Wykop
 		beforeEach(() => {
 			client = createTestClient(testConfig)
+			; (client as any)._http.defaults.adapter = httpAdapter
 		})
 		it('config should have set fields and default values for not set options', () => {
 			expect((client as any).config).toEqual({ ...defaultClientConfig, ...testConfig })
 		})
 		describe('makeRequest', () => {
 			it('1', () => {
-				expect(client.makeRequest('/entries/stream/')).toBe('daa')
+				const scope = nock('https://a2.wykop.pl')
+					.get('/entries/stream')
+					.reply(200, 'test response')
+				client.makeRequest('entries/stream').then(response => {
+					console.log(response)
+					expect(response.data).toBe('test response')
+				})
 			})
 		})
 	})
