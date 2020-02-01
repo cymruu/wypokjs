@@ -2,7 +2,7 @@ import axios, { AxiosInstance, AxiosResponse } from 'axios'
 import { createHash } from 'crypto'
 import { promises, resolve } from 'dns'
 
-export interface WykopAPIClientConfig {
+export interface IWykopConfig {
 	appkey: string
 	secret: string
 	host?: string
@@ -10,17 +10,17 @@ export interface WykopAPIClientConfig {
 	userAgent?: string
 }
 export type namedParamsT = { [key: string]: string }
-interface WykopRequestParams {
+interface IRequestParams {
 	apiParam?: string,
 	namedParams?: namedParamsT
 	postParams?: any
 }
-interface WykopRequestOptions {
+interface IRequestOptions {
 	data?: 'full' | 'compacted'
 	output?: 'clear' | 'both' | ''
 	//return?: string //TODO: learn how this option should look because API doesnt say a word about syntax of this field
 }
-const emptyRequestParmas: WykopRequestParams = {
+const emptyRequestParmas: IRequestParams = {
 	apiParam: '',
 	namedParams: Object.create(null),
 	postParams: undefined,
@@ -32,10 +32,10 @@ export const defaultClientConfig = {
 }
 
 export class Wykop {
-	private config: WykopAPIClientConfig
+	private config: IWykopConfig
 	private _http: AxiosInstance
 	private _baseUrl: string
-	constructor(config: WykopAPIClientConfig) {
+	constructor(config: IWykopConfig) {
 		this.config = { ...defaultClientConfig, ...config }
 		this._baseUrl = new URL(`https://${this.config.host}`).toString()
 		this._http = axios.create()
@@ -49,14 +49,14 @@ export class Wykop {
 		this._http.defaults.timeout = this.config.timeout
 		this._http.defaults.headers.common['User-Agent'] = this.config.userAgent
 	}
-	private buildUrl(endpoint: string, { apiParam, namedParams }: WykopRequestParams): URL {
+	private buildUrl(endpoint: string, { apiParam, namedParams }: IRequestParams): URL {
 		if (endpoint.charAt(0) === '/') { endpoint = endpoint.substr(1) }
 		if (endpoint.charAt(endpoint.length - 1) === '/') { endpoint = endpoint.substring(0, endpoint.length - 1) }
 		return new URL(
 			`${endpoint}/${apiParam}${apiParam ? '/' : ''}${Wykop.namedParamsToString(namedParams)}`, this._baseUrl,
 		)
 	}
-	private signRequest(url: string, { postParams }: WykopRequestParams) {
+	private signRequest(url: string, { postParams }: IRequestParams) {
 		let signData = `${this.config.secret}${url}`
 		if (postParams) {
 			//formBody | multipart
@@ -68,8 +68,7 @@ export class Wykop {
 		}
 		return createHash('md5').update(signData).digest('hex')
 	}
-	public makeRequest(endpoint: string, params: WykopRequestParams = {}, requestOptions?: WykopRequestOptions) {
-		//TODO: request options (padding, data, output, return)
+	public makeRequest(endpoint: string, params: IRequestParams = {}, requestOptions?: IRequestOptions) {
 		params = { ...emptyRequestParmas, namedParams: { ...requestOptions }, ...params }
 		params.namedParams['appkey'] = this.config.appkey
 		const requestURL = this.buildUrl(endpoint, params).toString()
