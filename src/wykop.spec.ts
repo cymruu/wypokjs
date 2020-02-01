@@ -31,14 +31,12 @@ describe('wykop class tests', () => {
 			expect((client as any).config).toEqual({ ...defaultClientConfig, ...testConfig })
 		})
 		describe('makeRequest', () => {
-			it('1', () => {
+			it('1', async () => {
 				const scope = nock('https://a2.wykop.pl')
 					.get('/entries/stream')
 					.reply(200, 'test response')
-				client.makeRequest('entries/stream').then(response => {
-					console.log(response)
-					expect(response.data).toBe('test response')
-				})
+				const response = await client.makeRequest('entries/stream')
+				expect(response.data).toBe('test response')
 			})
 		})
 	})

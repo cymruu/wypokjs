@@ -6,9 +6,5 @@ export const testConfig: WykopAPIClientConfig = {
 }
 
 export function createTestClient(config: WykopAPIClientConfig) {
-	const client = new Wykop(config)
-	client._http.interceptors.request.use((config) => {
-		return false
-	})
-	return client
+	return new Wykop(config)
 }
