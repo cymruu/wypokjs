@@ -18,7 +18,7 @@ interface WykopRequestParams {
 const emptyRequestParmas: WykopRequestParams = {
 	apiParam: '',
 	namedParams: Object.create(null),
-	postParams: Object.create(null),
+	postParams: undefined,
 }
 export const defaultClientConfig = {
 	userAgent: 'wypokJS/0.0.1',
@@ -29,7 +29,7 @@ export const defaultClientConfig = {
 export class Wykop {
 	private config: WykopAPIClientConfig
 	private _http: AxiosInstance
-	private _baseUrl:string
+	private _baseUrl: string
 	constructor(config: WykopAPIClientConfig) {
 		this.config = { ...defaultClientConfig, ...config }
 		this._baseUrl = new URL(`https://${this.config.host}`).toString()
@@ -45,25 +45,31 @@ export class Wykop {
 		this._http.defaults.headers.common['User-Agent'] = this.config.userAgent
 	}
 	private buildUrl(endpoint: string, { apiParam, namedParams }: WykopRequestParams): URL {
-		if (endpoint.charAt(0) === '/') {endpoint = endpoint.substr(1)}
-		if (endpoint.charAt(endpoint.length - 1) === '/') { endpoint = endpoint.substring(0, endpoint.length - 1)}
+		if (endpoint.charAt(0) === '/') { endpoint = endpoint.substr(1) }
+		if (endpoint.charAt(endpoint.length - 1) === '/') { endpoint = endpoint.substring(0, endpoint.length - 1) }
 		return new URL(
 			`${endpoint}/${apiParam}${apiParam ? '/' : ''}${Wykop.namedParamsToString(namedParams)}`, this._baseUrl,
 		)
 	}
-	private signRequest(url: URL, { postParams }: WykopRequestParams) {
+	private signRequest(url: string, { postParams }: WykopRequestParams) {
 		const signData = `${this.config.secret}${url}`
 		if (postParams) {
 			//formBody | multipart
 		}
 		return createHash('md5').update(signData).digest('hex')
 	}
-	public makeRequest(endpoint: string, params: WykopRequestParams = {}) {
-		params = { ...emptyRequestParmas, ...params }
+	public makeRequest(endpoint: string, params: WykopRequestParams = {}, requestOptions?: {}) {
+		//TODO: request options (padding, data, output, return)
+		//https://www.wykop.pl/dla-programistow/apiv2docs/przekazywanie-parametrow/
+		params = { ...emptyRequestParmas, ...params, ...requestOptions }
+		params.namedParams['appkey'] = this.config.appkey
+		const requestURL = this.buildUrl(endpoint, params).toString()
+		const apisign = this.signRequest(requestURL, params)
 		return this._http.request({
 			method: params.postParams ? 'POST' : 'GET',
-			url: this.buildUrl(endpoint, params).toString(),
-			data: params.postParams || undefined,
+			url: requestURL,
+			data: params.postParams,
+			headers: { apisign },
 		})
 	}
 }
