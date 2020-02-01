@@ -23,11 +23,13 @@ describe('wykop class tests', () => {
 		beforeEach(() => {
 			client = createTestClient(testConfig)
 		})
-		it('config should have set fields and defaults one', () => {
+		it('config should have set fields and default values for not set options', () => {
 			expect((client as any).config).toEqual({ ...defaultClientConfig, ...testConfig })
 		})
-		it('request', () => {
-			client.makeRequest('/', { apiParam: '1', namedParams: {}, postParams: {} })
+		describe('makeRequest', () => {
+			it('1', () => {
+				expect(client.makeRequest('/entries/stream/')).toBe('daa')
+			})
 		})
 	})
 })
