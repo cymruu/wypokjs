@@ -38,6 +38,20 @@ describe('wykop class tests', () => {
 				const response = await client.makeRequest('entries/stream')
 				expect(response.request.headers).toMatchObject({ 'user-agent': defaultClientConfig.userAgent })
 			})
+			it('get request should not have Content-Type header', async () => {
+				nock('https://a2.wykop.pl')
+					.get(/\/entries\/stream\/.*/)
+					.reply(200)
+				const response = await client.makeRequest('entries/stream')
+				expect(response.request.headers).not.toHaveProperty('content-type')
+			})
+			it('POST request should have Content-Type header', async () => {
+				nock('https://a2.wykop.pl')
+					.post(/\/entries\/add\/.*/)
+					.reply(200)
+				const response = await client.makeRequest('entries/add', { postParams: { body: 'content' } })
+				expect(response.request.headers).toMatchObject({ 'content-type': 'application/x-www-form-urlencoded' })
+			})
 		})
 		describe('apisign tests', () => {
 			it('apisign for request with default namedParams only', async () => {

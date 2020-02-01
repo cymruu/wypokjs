@@ -74,11 +74,18 @@ export class Wykop {
 		params.namedParams['appkey'] = this.config.appkey
 		const requestURL = this.buildUrl(endpoint, params).toString()
 		const apisign = this.signRequest(requestURL, params)
+		const headers = {
+			apisign,
+		}
+		if (params.postParams) {
+			//if multipart
+			headers['content-type'] = 'application/x-www-form-urlencoded'
+		}
 		return this._http.request({
 			method: params.postParams ? 'POST' : 'GET',
 			url: requestURL,
 			data: params.postParams,
-			headers: { apisign },
+			headers,
 		})
 	}
 }
