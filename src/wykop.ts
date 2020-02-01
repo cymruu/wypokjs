@@ -15,6 +15,11 @@ interface WykopRequestParams {
 	namedParams?: namedParamsT
 	postParams?: any
 }
+interface WykopRequestOptions {
+	data?: 'full' | 'compacted'
+	output?: 'clear' | 'both' | ''
+	//return?: string //TODO: learn how this option should look because API doesnt say a word about syntax of this field
+}
 const emptyRequestParmas: WykopRequestParams = {
 	apiParam: '',
 	namedParams: Object.create(null),
@@ -52,16 +57,20 @@ export class Wykop {
 		)
 	}
 	private signRequest(url: string, { postParams }: WykopRequestParams) {
-		const signData = `${this.config.secret}${url}`
+		let signData = `${this.config.secret}${url}`
 		if (postParams) {
 			//formBody | multipart
+			signData += Object.keys(postParams)
+				.filter(key => postParams[key])
+				.sort()
+				.map(key => postParams[key])
+				.join(',')
 		}
 		return createHash('md5').update(signData).digest('hex')
 	}
-	public makeRequest(endpoint: string, params: WykopRequestParams = {}, requestOptions?: {}) {
+	public makeRequest(endpoint: string, params: WykopRequestParams = {}, requestOptions?: WykopRequestOptions) {
 		//TODO: request options (padding, data, output, return)
-		//https://www.wykop.pl/dla-programistow/apiv2docs/przekazywanie-parametrow/
-		params = { ...emptyRequestParmas, ...params, ...requestOptions }
+		params = { ...emptyRequestParmas, namedParams: { ...requestOptions }, ...params }
 		params.namedParams['appkey'] = this.config.appkey
 		const requestURL = this.buildUrl(endpoint, params).toString()
 		const apisign = this.signRequest(requestURL, params)
