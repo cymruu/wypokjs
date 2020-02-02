@@ -88,4 +88,17 @@ export class Wykop {
 			headers,
 		})
 	}
+	public async request(endpoint: string, params: IRequestParams = {}, requestOptions?: IRequestOptions) {
+		return new Promise((resolve, reject) => {
+			this.makeRequest(endpoint, params, requestOptions).then(
+				response => {
+					if (response.data.error) {
+						console.log('Wykop error')
+						throw new Error(JSON.stringify(response.data.error))
+					}
+					resolve(response.data.data)
+				},
+			).catch(error => reject(error))
+		})
+	}
 }

@@ -16,9 +16,11 @@ export class Client {
 		}
 	}
 	public async getUserKey() {
-		const response = await this._ctx.makeRequest(
+		this._ctx.makeRequest(
 			'login/index',
 			{ postParams: { login: this._config.username, accountkey: this._config.accountkey } },
-		)
+		).then(response => {
+			console.log(response)
+		})
 	}
 }
