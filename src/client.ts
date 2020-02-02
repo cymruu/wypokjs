@@ -20,6 +20,5 @@ export class Client {
 			'login/index',
 			{ postParams: { login: this._config.username, accountkey: this._config.accountkey } },
 		)
-		console.log(response)
 	}
 }

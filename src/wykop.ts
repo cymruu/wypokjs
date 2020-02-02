@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios'
 import { createHash } from 'crypto'
 import { promises, resolve } from 'dns'
+import querystring from 'querystring'
 
 export interface IWykopConfig {
 	appkey: string
@@ -17,7 +18,7 @@ interface IRequestParams {
 }
 interface IRequestOptions {
 	data?: 'full' | 'compacted'
-	output?: 'clear' | 'both' | ''
+	output?: 'clear' | 'both'
 	//return?: string //TODO: learn how this option should look because API doesnt say a word about syntax of this field
 }
 const emptyRequestParmas: IRequestParams = {
@@ -62,7 +63,6 @@ export class Wykop {
 			//formBody | multipart
 			signData += Object.keys(postParams)
 				.filter(key => postParams[key])
-				.sort()
 				.map(key => postParams[key])
 				.join(',')
 		}
@@ -76,14 +76,15 @@ export class Wykop {
 		const headers = {
 			apisign,
 		}
-		if (params.postParams) {
+		const isPOSTRequest = params.postParams ? true : false
+		if (isPOSTRequest) {
 			//if multipart
 			headers['content-type'] = 'application/x-www-form-urlencoded'
 		}
 		return this._http.request({
-			method: params.postParams ? 'POST' : 'GET',
+			method: isPOSTRequest ? 'POST' : 'GET',
 			url: requestURL,
-			data: params.postParams,
+			data: isPOSTRequest ? querystring.stringify(params.postParams) : undefined,
 			headers,
 		})
 	}
