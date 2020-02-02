@@ -2,6 +2,7 @@ import axios, { AxiosInstance, AxiosResponse } from 'axios'
 import { createHash } from 'crypto'
 import { promises, resolve } from 'dns'
 import querystring from 'querystring'
+import { IWykopResponse } from './models/WykopResponse'
 
 export interface IWykopConfig {
 	appkey: string
@@ -88,10 +89,10 @@ export class Wykop {
 			headers,
 		})
 	}
-	public async request(endpoint: string, params: IRequestParams = {}, requestOptions?: IRequestOptions) {
+	public async request<T>(endpoint: string, params: IRequestParams = {}, requestOptions?: IRequestOptions) {
 		return new Promise((resolve, reject) => {
 			this.makeRequest(endpoint, params, requestOptions).then(
-				response => {
+				(response:AxiosResponse<IWykopResponse<T>>) => {
 					if (response.data.error) {
 						console.log('Wykop error')
 						throw new Error(JSON.stringify(response.data.error))
