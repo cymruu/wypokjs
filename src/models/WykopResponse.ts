@@ -4,10 +4,12 @@ export interface IWykopResponse<T> {
         next: string,
         prev: string,
     }
-    error: {
-        code: number,
-        field: any //TODO: learn what it is
-        message_pl: string
-        message_en: string
-    }
+    error: IWykopError
+}
+
+export interface IWykopError {
+	code: number
+	field: string
+	message_en: string
+	message_pl: string
 }

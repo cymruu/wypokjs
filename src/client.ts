@@ -11,16 +11,16 @@ export class Client {
 	constructor(ctx: Wykop, config: IClientConfig) {
 		this._ctx = ctx
 		this._config = config
-		if (this._config.userkey) {
-			//getUserKey
+		if (!this._config.userkey) {
+			this.getUserKey()
 		}
 	}
 	public async getUserKey() {
-		this._ctx.makeRequest(
+		this._ctx.request(
 			'login/index',
 			{ postParams: { login: this._config.username, accountkey: this._config.accountkey } },
 		).then(response => {
-			console.log(response)
+			response
 		})
 	}
 }

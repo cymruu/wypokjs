@@ -1,8 +1,8 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios'
+import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios'
 import { createHash } from 'crypto'
 import { promises, resolve } from 'dns'
 import querystring from 'querystring'
-import { IWykopResponse } from './models/WykopResponse'
+import { IWykopResponse, IWykopError } from './models/WykopResponse'
 
 export interface IWykopConfig {
 	appkey: string
@@ -69,7 +69,7 @@ export class Wykop {
 		}
 		return createHash('md5').update(signData).digest('hex')
 	}
-	public makeRequest(endpoint: string, params: IRequestParams = {}, requestOptions?: IRequestOptions) {
+	private makeRequest(endpoint: string, params: IRequestParams = {}, requestOptions?: IRequestOptions) {
 		params = { ...emptyRequestParmas, namedParams: { ...requestOptions }, ...params }
 		params.namedParams['appkey'] = this.config.appkey
 		const requestURL = this.buildUrl(endpoint, params).toString()
@@ -92,14 +92,22 @@ export class Wykop {
 	public async request<T>(endpoint: string, params: IRequestParams = {}, requestOptions?: IRequestOptions) {
 		return new Promise((resolve, reject) => {
 			this.makeRequest(endpoint, params, requestOptions).then(
-				(response:AxiosResponse<IWykopResponse<T>>) => {
+				(response: AxiosResponse<IWykopResponse<T>>) => {
 					if (response.data.error) {
-						console.log('Wykop error')
-						throw new Error(JSON.stringify(response.data.error))
+						throw new WykopError(response.data.error, response.request)
 					}
 					resolve(response.data.data)
 				},
 			).catch(error => reject(error))
 		})
+	}
+}
+class WykopError extends Error {
+	constructor(private errorObject: IWykopError, public request: any) {
+		super()
+		this.name = 'WykopAPIError'
+	}
+	toString() {
+		return `${this.name} [${this.errorObject.code}] ${this.errorObject.message_en}`
 	}
 }
