@@ -1,4 +1,4 @@
-import { Wykop, namedParamsT, defaultClientConfig } from './wykop'
+import { Wykop, namedParamsT, defaultClientConfig, WykopError } from './wykop'
 import { testConfig, createTestClient } from './testUtils/testConfig'
 import nock from 'nock'
 import httpAdapter from 'axios/lib/adapters/http'
@@ -25,7 +25,7 @@ describe('wykop class tests', () => {
 		let client: Wykop
 		beforeEach(() => {
 			client = createTestClient(testConfig)
-			;(client as any)._http.defaults.adapter = httpAdapter
+			; (client as any)._http.defaults.adapter = httpAdapter
 		})
 		it('config should have set fields and default values for not set options', () => {
 			expect((client as any).config).toEqual({ ...defaultClientConfig, ...testConfig })
@@ -35,22 +35,37 @@ describe('wykop class tests', () => {
 				nock('https://a2.wykop.pl')
 					.get(/\/entries\/stream\/.*/)
 					.reply(200)
-				const response = await client.makeRequest('entries/stream')
+				const response = await client['makeRequest']('entries/stream')
 				expect(response.request.headers).toMatchObject({ 'user-agent': defaultClientConfig.userAgent })
 			})
 			it('get request should not have Content-Type header', async () => {
 				nock('https://a2.wykop.pl')
 					.get(/\/entries\/stream\/.*/)
 					.reply(200)
-				const response = await client.makeRequest('entries/stream')
+				const response = await client['makeRequest']('entries/stream')
 				expect(response.request.headers).not.toHaveProperty('content-type')
 			})
 			it('POST request should have Content-Type header', async () => {
 				nock('https://a2.wykop.pl')
 					.post(/\/entries\/add\/.*/)
 					.reply(200)
-				const response = await client.makeRequest('entries/add', { postParams: { body: 'content' } })
+				const response = await client['makeRequest']('entries/add', { postParams: { body: 'content' } })
 				expect(response.request.headers).toMatchObject({ 'content-type': 'application/x-www-form-urlencoded' })
+			})
+			describe('failure', () => {
+				it('if api returns error, request should throw', async () => {
+					nock('https://a2.wykop.pl')
+						.get(/\/entries\/stream\/.*/)
+						.reply(200, {
+							error: {
+								code: 429,
+								field: '',
+								message_en: 'Limit przekroczony',
+								message_pl: 'Limit exceeded',
+							},
+						})
+					expect(client.request('entries/stream')).rejects.toBeInstanceOf(WykopError)
+				})
 			})
 		})
 		describe('apisign tests', () => {
@@ -58,14 +73,16 @@ describe('wykop class tests', () => {
 				nock('https://a2.wykop.pl')
 					.get(/\/entries\/stream\/.*/)
 					.reply(200)
-				const response = await client.makeRequest('entries/stream')
+				const response = await client['makeRequest']('entries/stream')
 				expect(response.request.headers).toMatchObject({ 'apisign': '29e8293fc1a92e563468673b7f6b5292' })
 			})
 			it('apisign for request with namedParams', async () => {
 				nock('https://a2.wykop.pl')
 					.get(/\/entries\/hot\/.*/)
 					.reply(200)
-				const response = await client.makeRequest('entries/hot', { namedParams: { page: '1', period: '12' } })
+				const response = await client['makeRequest']('entries/hot',
+					{ namedParams: { page: '1', period: '12' } },
+				)
 				expect(response.request.headers).toMatchObject({ 'apisign': 'b2737520793976dc044e0cf26309e68a' })
 			})
 		})

@@ -94,7 +94,8 @@ export class Wykop {
 			this.makeRequest(endpoint, params, requestOptions).then(
 				(response: AxiosResponse<IWykopResponse<T>>) => {
 					if (response.data.error) {
-						throw new WykopError(response.data.error, response.request)
+						reject(new WykopError(response.data.error, response.request))
+						return
 					}
 					resolve(response.data.data)
 				},
@@ -102,7 +103,7 @@ export class Wykop {
 		})
 	}
 }
-class WykopError extends Error {
+export class WykopError extends Error {
 	constructor(private errorObject: IWykopError, public request: any) {
 		super()
 		this.name = 'WykopAPIError'
