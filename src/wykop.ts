@@ -90,7 +90,7 @@ export class Wykop {
 		})
 	}
 	public async request<T>(endpoint: string, params: IRequestParams = {}, requestOptions?: IRequestOptions) {
-		return new Promise((resolve, reject) => {
+		return new Promise<T>((resolve, reject) => {
 			this.makeRequest(endpoint, params, requestOptions).then(
 				(response: AxiosResponse<IWykopResponse<T>>) => {
 					if (response.data.error) {

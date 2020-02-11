@@ -1,4 +1,5 @@
 import { Wykop } from './wykop'
+import { LoginResponse } from './models/LoginResponse'
 
 interface IClientConfig {
 	username: string
@@ -16,11 +17,11 @@ export class Client {
 		}
 	}
 	public async getUserKey() {
-		this._ctx.request(
+		this._ctx.request<LoginResponse>(
 			'login/index',
 			{ postParams: { login: this._config.username, accountkey: this._config.accountkey } },
 		).then(response => {
-			response
+			this._config.userkey = response.userkey
 		})
 	}
 }
