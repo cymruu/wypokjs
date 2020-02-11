@@ -1,4 +1,4 @@
-import { Wykop } from './wykop'
+import { Wykop, IRequestParams, IRequestOptions } from './wykop'
 import { LoginResponse } from './models/LoginResponse'
 
 interface IClientConfig {
@@ -14,6 +14,14 @@ export class Client {
 		this._config = config
 		if (!this._config.userkey) {
 			this.getUserKey()
+			this.request('entries/add', { postParams: { body: 'siema' } })
+		}
+	}
+	private async request<T>(endpoint: string, params: IRequestParams = {}, requestOptions?: IRequestOptions) {
+		try {
+			const response = await this._ctx.request(endpoint, params, requestOptions)
+		} catch (error) {
+			console.log(error)
 		}
 	}
 	public async getUserKey() {

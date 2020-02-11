@@ -1,6 +1,8 @@
+import { WykopColor } from './WykopColor'
+
 export interface Profile {
     login: string;
-    color: number;
+    color: WykopColor;
     sex: string;
     avatar: string;
     signup_at: Date;

@@ -12,12 +12,12 @@ export interface IWykopConfig {
 	userAgent?: string
 }
 export type namedParamsT = { [key: string]: string }
-interface IRequestParams {
+export interface IRequestParams {
 	apiParam?: string,
 	namedParams?: namedParamsT
 	postParams?: any
 }
-interface IRequestOptions {
+export interface IRequestOptions {
 	data?: 'full' | 'compacted'
 	output?: 'clear' | 'both'
 	//return?: string //TODO: learn how this option should look because API doesnt say a word about syntax of this field
