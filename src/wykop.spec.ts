@@ -1,8 +1,7 @@
 import { Wykop, namedParamsT, defaultClientConfig, WykopError } from './wykop'
 import { testConfig, createTestClient } from './testUtils/testConfig'
 import nock from 'nock'
-import httpAdapter from 'axios/lib/adapters/http'
-import Axios from 'axios'
+
 
 describe('wykop class tests', () => {
 	describe('namedParamsToString method', () => {
@@ -24,8 +23,7 @@ describe('wykop class tests', () => {
 	describe('wykop client tests', () => {
 		let client: Wykop
 		beforeEach(() => {
-			client = createTestClient(testConfig)
-			; (client as any)._http.defaults.adapter = httpAdapter
+			client = createTestClient()
 		})
 		it('config should have set fields and default values for not set options', () => {
 			expect((client as any).config).toEqual({ ...defaultClientConfig, ...testConfig })

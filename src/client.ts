@@ -31,12 +31,15 @@ export class Client {
 			console.log(error)
 		}
 	}
-	public async getUserKey() {
-		this._ctx.request<LoginResponse>(
+	public getUserKey() {
+		return this._ctx.request<LoginResponse>(
 			'login/index',
 			{ postParams: { login: this._config.username, accountkey: this._config.accountkey } },
 		).then(response => {
 			this._config.userkey = response.userkey
+			return this._config.userkey
+		}).catch((error) => {
+			console.log(error)
 		})
 	}
 }
