@@ -17,7 +17,10 @@ describe('wykop client tests', () => {
 		nock('https://a2.wykop.pl')
 			.post(/\/login\/index\/.*/)
 			.reply(200, { data: { userkey: 'userkey123' } })
+			.persist()
+		await client.getUserKey()
 		expect(client.getUserKey()).resolves.toEqual('userkey123')
+		expect(client['_config'].userkey).toEqual('userkey123')
 	})
 	it('client request should add userkey to request namedParams', async () => {
 		nock('https://a2.wykop.pl')
