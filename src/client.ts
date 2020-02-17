@@ -16,7 +16,7 @@ export class Client {
 			this.getUserKey()
 		}
 	}
-	private async request<T>(endpoint: string, params: IRequestParams = {}, requestOptions?: IRequestOptions) {
+	public async request<T>(endpoint: string, params: IRequestParams = {}, requestOptions?: IRequestOptions) {
 		if (!params.namedParams) {
 			params.namedParams = { }
 		}
@@ -24,12 +24,8 @@ export class Client {
 			if (!this._config.userkey) {console.warn('Trying to authorize request with empty userkey')}
 			params.namedParams.userkey = this._config.userkey
 		}
-		try {
-			const response = await this._ctx.request<T>(endpoint, params, requestOptions)
-			console.log(response)
-		} catch (error) {
-			console.log(error)
-		}
+
+		return this._ctx.request<T>(endpoint, params, requestOptions)
 	}
 	public getUserKey() {
 		return this._ctx.request<LoginResponse>(
