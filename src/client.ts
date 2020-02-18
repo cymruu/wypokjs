@@ -9,6 +9,7 @@ interface IClientConfig {
 export class Client {
 	private _ctx: Wykop
 	private _config: IClientConfig
+	private _requestOptions?: IRequestOptions
 	constructor(ctx: Wykop, config: IClientConfig) {
 		this._ctx = ctx
 		this._config = config
@@ -16,7 +17,11 @@ export class Client {
 			this.getUserKey()
 		}
 	}
-	public async request<T>(endpoint: string, params: IRequestParams = {}, requestOptions?: IRequestOptions) {
+	public async request<T>(
+		endpoint: string,
+		params: IRequestParams = {},
+		requestOptions: IRequestOptions = this._requestOptions,
+	) {
 		if (!params.namedParams) {
 			params.namedParams = { }
 		}
@@ -37,5 +42,9 @@ export class Client {
 		}).catch((error) => {
 			console.log(error)
 		})
+	}
+
+	set requestOptions(requestOptions: IRequestOptions) {
+		this._requestOptions = requestOptions
 	}
 }

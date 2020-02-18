@@ -1,7 +1,7 @@
 import nock from 'nock'
-import { Wykop } from './wykop'
+import { Wykop, IRequestOptions } from './wykop'
 import { Client } from './client'
-import { testConfig, createTestClient } from './testUtils/testConfig'
+import { createTestClient, testRequestOptions } from './testUtils/testUtils'
 describe('wykop client tests', () => {
 	let wykop: Wykop
 	let client: Client
@@ -34,4 +34,18 @@ describe('wykop client tests', () => {
 			undefined,
 		)
 	})
+	it('client with requestoptions should include those in request', async () => {
+		nock('https://a2.wykop.pl')
+			.get(/\/entries\/stream\/.*/)
+			.reply(200)
+		client['_ctx'].request = jest.fn()
+		client.requestOptions = testRequestOptions
+		await client.request('entries/stream')
+		expect(client['_ctx'].request).toBeCalledWith(
+			expect.any(String),
+			expect.anything(),
+			testRequestOptions,
+		)
+	})
+
 })

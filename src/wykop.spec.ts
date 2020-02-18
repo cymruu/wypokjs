@@ -1,5 +1,5 @@
 import { Wykop, namedParamsT, defaultClientConfig, WykopError } from './wykop'
-import { testConfig, createTestClient } from './testUtils/testConfig'
+import { testConfig, createTestClient, testRequestOptions } from './testUtils/testUtils'
 import nock from 'nock'
 
 
@@ -35,6 +35,14 @@ describe('wykop class tests', () => {
 					.reply(200)
 				const response = await client['makeRequest']('entries/stream')
 				expect(response.request.headers).toMatchObject({ 'user-agent': defaultClientConfig.userAgent })
+			})
+			it('request url should contain requestOptions', async () => {
+				nock('https://a2.wykop.pl')
+					.get(/\/entries\/stream\/.*/)
+					.reply(200)
+				const response = await client['makeRequest']('entries/stream', null, testRequestOptions)
+				expect(response.config.url).toMatch(/data\/full/)
+				expect(response.config.url).toMatch(/output\/clear/)
 			})
 			it('get request should not have Content-Type header', async () => {
 				nock('https://a2.wykop.pl')
