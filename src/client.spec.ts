@@ -47,5 +47,9 @@ describe('wykop client tests', () => {
 			testRequestOptions,
 		)
 	})
-
+	it('client requestoptions setter', async () => {
+		expect(client['_requestOptions']).toBe(undefined)
+		client.requestOptions = testRequestOptions
+		expect(client['_requestOptions']).toMatchObject(testRequestOptions)
+	})
 })

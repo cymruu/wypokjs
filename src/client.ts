@@ -10,6 +10,7 @@ export class Client {
 	private _ctx: Wykop
 	private _config: IClientConfig
 	private _requestOptions?: IRequestOptions
+
 	constructor(ctx: Wykop, config: IClientConfig) {
 		this._ctx = ctx
 		this._config = config
@@ -17,6 +18,7 @@ export class Client {
 			this.getUserKey()
 		}
 	}
+
 	public async request<T>(
 		endpoint: string,
 		params: IRequestParams = {},
@@ -32,6 +34,7 @@ export class Client {
 
 		return this._ctx.request<T>(endpoint, params, requestOptions)
 	}
+
 	public getUserKey() {
 		return this._ctx.request<LoginResponse>(
 			'login/index',
