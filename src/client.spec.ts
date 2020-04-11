@@ -9,7 +9,6 @@ describe('wykop client', () => {
 	beforeEach(() => {
 		wykop = createTestClient(testConfig)
 		wykop.request = jest.fn().mockImplementation(() => new Promise(noop))
-		; (wykop as any)._http.defaults.adapter = httpAdapter
 	})
 	it('should call getUserKey on init', () => {
 		const client = new Client(wykop, { username: 'test', accountkey: 'accountkey' })

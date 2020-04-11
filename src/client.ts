@@ -21,8 +21,8 @@ export class Client {
 
 		return this._ctx.request<T>(endpoint, params, requestOptions)
 	}
-	public async getUserKey() {
-		this._ctx.request<LoginResponse>(
+	public getUserKey() {
+		return this._ctx.request<LoginResponse>(
 			'login/index',
 			{
 				postParams:
