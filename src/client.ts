@@ -1,35 +1,44 @@
-import { Wykop, IRequestParams, IRequestOptions } from './wykop'
+import { Wykop, IRequestParams, IRequestOptions, WykopError } from './wykop'
 import { LoginResponse } from './models/LoginResponse'
 
 interface IClientConfig {
 	username: string
 	accountkey: string
 	userkey?: string
+	password?: string //only allowed on apikeys for iOS, android app, OWM app
 }
 export class Client {
 	private _ctx: Wykop
 	private _config: IClientConfig
+	private _userkey: string
 	constructor(ctx: Wykop, config: IClientConfig) {
 		this._ctx = ctx
 		this._config = config
-		if (!this._config.userkey) {
+		this._userkey = this._config.userkey
+		if (!this._userkey) {
 			this.getUserKey()
-			this.request('entries/add', { postParams: { body: 'siema' } })
 		}
 	}
-	private async request<T>(endpoint: string, params: IRequestParams = {}, requestOptions?: IRequestOptions) {
-		try {
-			const response = await this._ctx.request(endpoint, params, requestOptions)
-		} catch (error) {
-			console.log(error)
-		}
+	public async request<T>(endpoint: string, params: IRequestParams = {}, requestOptions?: IRequestOptions) {
+		const contextNamedParams = { userkey: this._userkey }
+		params.namedParams = params.namedParams ? { ...params.namedParams, ...contextNamedParams } : contextNamedParams
+
+		return this._ctx.request<T>(endpoint, params, requestOptions)
 	}
 	public async getUserKey() {
 		this._ctx.request<LoginResponse>(
 			'login/index',
-			{ postParams: { login: this._config.username, accountkey: this._config.accountkey } },
+			{
+				postParams:
+				{
+					login: this._config.username,
+					accountkey: this._config.accountkey,
+					password: this._config.password,
+				},
+			},
 		).then(response => {
-			this._config.userkey = response.userkey
+			this._userkey = response.userkey
 		})
+		//TODO: handle error
 	}
 }
