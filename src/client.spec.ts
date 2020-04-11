@@ -1,55 +1,44 @@
 import nock from 'nock'
 import { Wykop, IRequestOptions } from './wykop'
 import { Client } from './client'
-import { createTestClient, testRequestOptions } from './testUtils/testUtils'
+import { createTestWrapper, testRequestOptions, testConfig } from './testUtils/testUtils'
 describe('wykop client tests', () => {
 	let wykop: Wykop
-	let client: Client
+	const noop = () => { }
 	beforeEach(() => {
-		wykop = createTestClient()
-		client = new Client(wykop, {
-			username: 'sokytsinolop',
-			accountkey: 'blah',
-			userkey: 'userkey', //to not call getUserKey in constructor
-		})
+		wykop = createTestWrapper(testConfig)
+		wykop.request = jest.fn().mockImplementation(() => new Promise(noop))
 	})
 	it('client get userkey', async () => {
 		nock('https://a2.wykop.pl')
 			.post(/\/login\/index\/.*/)
 			.reply(200, { data: { userkey: 'userkey123' } })
 			.persist()
+		const realWykop = createTestWrapper(testConfig)
+		const client = new Client(realWykop, { username: 'test', accountkey: 'accountkey', userkey: 'any' })
 		await client.getUserKey()
-		expect(client.getUserKey()).resolves.toEqual('userkey123')
-		expect(client['_config'].userkey).toEqual('userkey123')
+		expect(client['_userkey']).toEqual('userkey123')
 	})
-	it('client request should add userkey to request namedParams', async () => {
+	it('should not call getUserKey on init if userkey was provided', () => {
+		const _ = new Client(wykop, { username: 'test', accountkey: 'accountkey', userkey: 'any' })
+		expect(wykop.request).toHaveBeenCalledTimes(0)
+	})
+	it('making request from client should call request on context with client userkey', () => {
+		const client = new Client(wykop, { username: 'test', accountkey: 'accountkey', userkey: 'any' })
+		client.request('a')
+		expect(wykop.request).toBeCalledWith(expect.anything(), { namedParams: { userkey: 'any' } }, {})
+	})
+	it('client with requestoptions should be included in request', async () => {
 		nock('https://a2.wykop.pl')
 			.get(/\/entries\/stream\/.*/)
 			.reply(200)
-		client['_ctx'].request = jest.fn()
-		await client.request('entries/stream')
-		expect(client['_ctx'].request).toBeCalledWith(
-			expect.any(String),
-			expect.objectContaining({ namedParams: expect.objectContaining({ userkey: 'userkey' }) }),
-			undefined,
-		)
-	})
-	it('client with requestoptions should include those in request', async () => {
-		nock('https://a2.wykop.pl')
-			.get(/\/entries\/stream\/.*/)
-			.reply(200)
-		client['_ctx'].request = jest.fn()
+		const client = new Client(wykop, { username: 'test', accountkey: 'accountkey', userkey: 'any' })
 		client.requestOptions = testRequestOptions
-		await client.request('entries/stream')
-		expect(client['_ctx'].request).toBeCalledWith(
+		client.request('entries/stream')
+		expect(wykop.request).toBeCalledWith(
 			expect.any(String),
 			expect.anything(),
 			testRequestOptions,
 		)
-	})
-	it('client requestoptions setter', async () => {
-		expect(client['_requestOptions']).toBe(undefined)
-		client.requestOptions = testRequestOptions
-		expect(client['_requestOptions']).toMatchObject(testRequestOptions)
 	})
 })

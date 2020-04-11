@@ -1,9 +1,8 @@
 import { Wykop, namedParamsT, defaultClientConfig, WykopError } from './wykop'
-import { testConfig, createTestClient, testRequestOptions } from './testUtils/testUtils'
+import { testConfig, createTestWrapper, testRequestOptions } from './testUtils/testUtils'
 import nock from 'nock'
 
-
-describe('wykop class tests', () => {
+describe('wykop class', () => {
 	describe('namedParamsToString method', () => {
 		it('should correct query path string', () => {
 			const params: namedParamsT = {
@@ -20,27 +19,27 @@ describe('wykop class tests', () => {
 			expect(Wykop.namedParamsToString(params)).toEqual('appkey/appkeyValue/')
 		})
 	})
-	describe('wykop client tests', () => {
-		let client: Wykop
+	describe('wykop', () => {
+		let wykop: Wykop
 		beforeEach(() => {
-			client = createTestClient()
+			wykop = createTestWrapper(testConfig)
 		})
 		it('config should have set fields and default values for not set options', () => {
-			expect((client as any).config).toEqual({ ...defaultClientConfig, ...testConfig })
+			expect((wykop as any).config).toEqual({ ...defaultClientConfig, ...testConfig })
 		})
 		describe('makeRequest', () => {
 			it('request should have user agent header', async () => {
 				nock('https://a2.wykop.pl')
 					.get(/\/entries\/stream\/.*/)
 					.reply(200)
-				const response = await client['makeRequest']('entries/stream')
+				const response = await wykop['makeRequest']('entries/stream')
 				expect(response.request.headers).toMatchObject({ 'user-agent': defaultClientConfig.userAgent })
 			})
 			it('request url should contain requestOptions', async () => {
 				nock('https://a2.wykop.pl')
 					.get(/\/entries\/stream\/.*/)
 					.reply(200)
-				const response = await client['makeRequest']('entries/stream', null, testRequestOptions)
+				const response = await wykop['makeRequest']('entries/stream', null, testRequestOptions)
 				expect(response.config.url).toMatch(/data\/full/)
 				expect(response.config.url).toMatch(/output\/clear/)
 			})
@@ -48,14 +47,14 @@ describe('wykop class tests', () => {
 				nock('https://a2.wykop.pl')
 					.get(/\/entries\/stream\/.*/)
 					.reply(200)
-				const response = await client['makeRequest']('entries/stream')
+				const response = await wykop['makeRequest']('entries/stream')
 				expect(response.request.headers).not.toHaveProperty('content-type')
 			})
 			it('POST request should have Content-Type header', async () => {
 				nock('https://a2.wykop.pl')
 					.post(/\/entries\/add\/.*/)
 					.reply(200)
-				const response = await client['makeRequest']('entries/add', { postParams: { body: 'content' } })
+				const response = await wykop['makeRequest']('entries/add', { postParams: { body: 'content' } })
 				expect(response.request.headers).toMatchObject({ 'content-type': 'application/x-www-form-urlencoded' })
 			})
 			describe('failure', () => {
@@ -70,7 +69,7 @@ describe('wykop class tests', () => {
 								message_pl: 'Limit exceeded',
 							},
 						})
-					expect(client.request('entries/stream')).rejects.toBeInstanceOf(WykopError)
+					expect(wykop.request('entries/stream')).rejects.toBeInstanceOf(WykopError)
 				})
 			})
 		})
@@ -79,14 +78,14 @@ describe('wykop class tests', () => {
 				nock('https://a2.wykop.pl')
 					.get(/\/entries\/stream\/.*/)
 					.reply(200)
-				const response = await client['makeRequest']('entries/stream')
+				const response = await wykop['makeRequest']('entries/stream')
 				expect(response.request.headers).toMatchObject({ 'apisign': '29e8293fc1a92e563468673b7f6b5292' })
 			})
 			it('apisign for request with namedParams', async () => {
 				nock('https://a2.wykop.pl')
 					.get(/\/entries\/hot\/.*/)
 					.reply(200)
-				const response = await client['makeRequest']('entries/hot',
+				const response = await wykop['makeRequest']('entries/hot',
 					{ namedParams: { page: '1', period: '12' } },
 				)
 				expect(response.request.headers).toMatchObject({ 'apisign': 'b2737520793976dc044e0cf26309e68a' })

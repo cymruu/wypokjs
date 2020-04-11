@@ -1,50 +1,43 @@
-import { Wykop, IRequestParams, IRequestOptions } from './wykop'
+import { Wykop, IRequestParams, IRequestOptions, WykopError } from './wykop'
 import { LoginResponse } from './models/LoginResponse'
 
 interface IClientConfig {
 	username: string
 	accountkey: string
 	userkey?: string
+	password?: string //only allowed on apikeys for iOS, android app, OWM app
 }
 export class Client {
-	private _ctx: Wykop
-	private _config: IClientConfig
-	private _requestOptions?: IRequestOptions
-
-	constructor(ctx: Wykop, config: IClientConfig) {
-		this._ctx = ctx
-		this._config = config
-		if (!this._config.userkey) {
+	private _userkey: string
+	private _requestOptions: IRequestOptions
+	constructor(private _ctx: Wykop, private _config: IClientConfig) {
+		this._userkey = this._config.userkey
+		if (!this._userkey) {
 			this.getUserKey()
 		}
 	}
+	public async request<T>(endpoint: string, params: IRequestParams = {}, requestOptions?: IRequestOptions) {
+		const contextNamedParams = { userkey: this._userkey }
+		params.namedParams = params.namedParams ? { ...params.namedParams, ...contextNamedParams } : contextNamedParams
 
-	public async request<T>(
-		endpoint: string,
-		params: IRequestParams = {},
-		requestOptions: IRequestOptions = this._requestOptions,
-	) {
-		if (!params.namedParams) {
-			params.namedParams = { }
-		}
-		if (!params.namedParams.userkey) {
-			if (!this._config.userkey) {console.warn('Trying to authorize request with empty userkey')}
-			params.namedParams.userkey = this._config.userkey
-		}
-
-		return this._ctx.request<T>(endpoint, params, requestOptions)
+		return this._ctx.request<T>(endpoint, params, { ...this._requestOptions, ...requestOptions })
 	}
 
 	public getUserKey() {
 		return this._ctx.request<LoginResponse>(
 			'login/index',
-			{ postParams: { login: this._config.username, accountkey: this._config.accountkey } },
+			{
+				postParams:
+				{
+					login: this._config.username,
+					accountkey: this._config.accountkey,
+					password: this._config.password,
+				},
+			},
 		).then(response => {
-			this._config.userkey = response.userkey
-			return this._config.userkey
-		}).catch((error) => {
-			console.log(error)
+			this._userkey = response.userkey
 		})
+		//TODO: handle error
 	}
 
 	set requestOptions(requestOptions: IRequestOptions) {

@@ -6,7 +6,7 @@ export const testConfig: IWykopConfig = {
 	secret: 'testsecret',
 }
 
-export function createTestClient(config: IWykopConfig = testConfig) {
+export function createTestWrapper(config: IWykopConfig = testConfig) {
 	const client = new Wykop(config)
 	client['_http'].defaults.adapter = httpAdapter
 	return client

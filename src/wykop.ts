@@ -1,6 +1,5 @@
-import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios'
+import axios, { AxiosInstance, AxiosResponse } from 'axios'
 import { createHash } from 'crypto'
-import { promises, resolve } from 'dns'
 import querystring from 'querystring'
 import { IWykopResponse, IWykopError } from './models/WykopResponse'
 
@@ -82,10 +81,12 @@ export class Wykop {
 			//if multipart
 			headers['content-type'] = 'application/x-www-form-urlencoded'
 		}
+		const payload = isPOSTRequest ? querystring.stringify(params.postParams) : undefined
+
 		return this._http.request({
 			method: isPOSTRequest ? 'POST' : 'GET',
 			url: requestURL,
-			data: isPOSTRequest ? querystring.stringify(params.postParams) : undefined,
+			data: payload,
 			headers,
 		})
 	}
