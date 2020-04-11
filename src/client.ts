@@ -8,12 +8,8 @@ interface IClientConfig {
 	password?: string //only allowed on apikeys for iOS, android app, OWM app
 }
 export class Client {
-	private _ctx: Wykop
-	private _config: IClientConfig
 	private _userkey: string
-	constructor(ctx: Wykop, config: IClientConfig) {
-		this._ctx = ctx
-		this._config = config
+	constructor(private _ctx: Wykop, private _config: IClientConfig) {
 		this._userkey = this._config.userkey
 		if (!this._userkey) {
 			this.getUserKey()
