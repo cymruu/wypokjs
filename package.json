@@ -2,7 +2,7 @@
   "name": "wypokjs",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "npx typescript",
     "lint": "npx eslint . --ext .ts",
