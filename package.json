@@ -1,7 +1,7 @@
 {
   "name": "wypokjs",
-  "version": "0.0.1",
-  "description": "",
+  "version": "0.1.0",
+  "description": "Wykop V2 API wrapper",
   "main": "dist/index.js",
   "scripts": {
     "build": "npx typescript",
