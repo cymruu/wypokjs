@@ -43,8 +43,9 @@ export class Wykop {
 		this.configureHttpClient()
 	}
 	static namedParamsToString(namedParams: namedParamsT) {
-		return Object.entries(namedParams).filter(([, key]) => key)
-			.reduce((p, [key, value]) => `${p}${key}/${value}/`, '')
+		const { appkey, ...rest } = namedParams
+		return Object.entries(rest).filter(([, key]) => key)
+			.reduce((p, [key, value]) => `${p}${key}/${value}/`, `appkey/${appkey}/`)
 	}
 	private configureHttpClient() {
 		this._http.defaults.timeout = this.config.timeout
@@ -62,7 +63,6 @@ export class Wykop {
 		if (postParams) {
 			//formBody | multipart
 			signData += Object.keys(postParams)
-				.filter(key => postParams[key])
 				.map(key => postParams[key])
 				.join(',')
 		}

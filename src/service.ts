@@ -19,10 +19,10 @@ class EntriesService extends WykopApiService {
 	}
 	CommentAdd(
 		entryId: string | number,
-		{ body, embed = undefined, adultmedia = false }: { body: string; embed?: string; adultmedia?: boolean }
+		{ body, embed = undefined, adultmedia = false }: { body: string; embed?: string; adultmedia?: boolean },
 	) {
 		return this.ctx.request(
-			`${this.endpoint}/commentadd`, { apiParam: entryId.toString(), postParams: { body, embed, adultmedia } }
+			`${this.endpoint}/commentadd`, { apiParam: entryId.toString(), postParams: { body, embed, adultmedia } },
 		)
 	}
 	CommentUpvoters(entryCommentId: string | number) {

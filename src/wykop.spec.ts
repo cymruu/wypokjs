@@ -88,7 +88,7 @@ describe('wykop class', () => {
 				const response = await wykop['makeRequest']('entries/hot',
 					{ namedParams: { page: '1', period: '12' } },
 				)
-				expect(response.request.headers).toMatchObject({ 'apisign': 'b2737520793976dc044e0cf26309e68a' })
+				expect(response.request.headers).toMatchObject({ 'apisign': '85250c801fc96a22809a3843c52b0cb2' })
 			})
 		})
 	})
