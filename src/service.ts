@@ -17,6 +17,9 @@ class EntriesService extends WykopApiService {
 	Delete(entryId: string | number) {
 		return this.ctx.request(`${this.endpoint}/delete`, { apiParam: entryId.toString() })
 	}
+	Comment(commentId: string | number) {
+		return this.ctx.request(`${this.endpoint}/comment`, { apiParam: commentId.toString() })
+	}
 	CommentAdd(
 		entryId: string | number,
 		{ body, embed = undefined, adultmedia = false }: { body: string; embed?: string; adultmedia?: boolean },
