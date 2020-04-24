@@ -27,7 +27,7 @@ const emptyRequestParmas: IRequestParams = {
 	postParams: undefined,
 }
 export const defaultClientConfig = {
-	userAgent: 'wypokJS/0.0.1',
+	userAgent: 'wypokJS/0.1.2',
 	host: 'a2.wykop.pl',
 	timeout: 5000,
 }
