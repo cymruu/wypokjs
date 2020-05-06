@@ -40,7 +40,7 @@ class Pm extends WykopApiService {
 	private endpoint = 'pm'
 	//TODO: embed param
 	SendMessage(receiver: string, body: string) {
-		return this.ctx.request(`${this.endpoint}/commentdelete`, { apiParam: receiver, postParams: { body } })
+		return this.ctx.request(`${this.endpoint}/sendmessage`, { apiParam: receiver, postParams: { body } })
 	}
 }
 
