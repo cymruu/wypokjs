@@ -32,11 +32,13 @@ export const defaultClientConfig = {
 	timeout: 5000,
 }
 
+type errorInterceptor = (error: WykopError | AxiosError) => typeof error
+
 export class Wykop {
 	private config: IWykopConfig
 	private _http: AxiosInstance
 	private _baseUrl: string
-	constructor(config: IWykopConfig) {
+	constructor(config: IWykopConfig, private errorInterceptors: errorInterceptor[] = []) {
 		this.config = { ...defaultClientConfig, ...config }
 		this._baseUrl = new URL(`https://${this.config.host}`).toString()
 		this._http = axios.create()
@@ -95,16 +97,18 @@ export class Wykop {
 			this.makeRequest(endpoint, params, requestOptions).then(
 				(response: AxiosResponse<IWykopResponse<T>>) => {
 					if (response.data.error) {
-						return reject(new WykopError(response.status, response.data.error))
+						return reject({ response })
 					}
 					resolve(response.data.data)
 				},
-			).catch((error: AxiosError<IWykopResponse<T>>) => {
-				if (error.response.data.error) {
-					reject(new WykopError(error.response.status, error.response.data.error))
-				}
-				return reject(error)
-			})
+			)
+		}).catch((error: AxiosError<IWykopResponse<T>>) => {
+			let errorObject: AxiosError | WykopError = error
+			if (error.response.data.error) {
+				errorObject = new WykopError(error.response.status, error.response.data.error)
+			}
+			throw this.errorInterceptors
+				.reduce((errorObject, currentInterceptor) => currentInterceptor(errorObject), errorObject)
 		})
 	}
 }

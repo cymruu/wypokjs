@@ -16,6 +16,7 @@ export class Client {
 			this.relogin()
 		}
 	}
+
 	public async request<T>(endpoint: string, params: IRequestParams = {}, requestOptions?: IRequestOptions) {
 		const contextNamedParams = { userkey: this._userkey }
 		params.namedParams = params.namedParams ? { ...params.namedParams, ...contextNamedParams } : contextNamedParams
@@ -29,7 +30,7 @@ export class Client {
 			})
 	}
 
-	public getUserKey() {
+	private getUserKey() {
 		return this._ctx.request<LoginResponse>(
 			'login/index',
 			{
@@ -41,11 +42,13 @@ export class Client {
 				},
 			},
 		).then(response => response.userkey)
-		//TODO: handle error
 	}
-	private relogin() {
-		return this.getUserKey().then(x => {
-			this._userkey = x
+
+	public relogin() {
+		return this.getUserKey().then(userkey => {
+			this._userkey = userkey
+		}).catch(err => {
+			console.error(err.toString())
 		})
 	}
 
