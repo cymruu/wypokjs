@@ -13,7 +13,7 @@ export class Client {
 	constructor(private _ctx: Wykop, private _config: IClientConfig) {
 		this._userkey = this._config.userkey
 		if (!this._userkey) {
-			this.getUserKey()
+			this.relogin()
 		}
 	}
 	public async request<T>(endpoint: string, params: IRequestParams = {}, requestOptions?: IRequestOptions) {
@@ -21,6 +21,12 @@ export class Client {
 		params.namedParams = params.namedParams ? { ...params.namedParams, ...contextNamedParams } : contextNamedParams
 
 		return this._ctx.request<T>(endpoint, params, { ...this._requestOptions, ...requestOptions })
+			.catch((err: WykopError) => {
+				if (err.httpStatus === 401) {
+					this.relogin()
+				}
+				throw err
+			})
 	}
 
 	public getUserKey() {
@@ -34,10 +40,13 @@ export class Client {
 					password: this._config.password,
 				},
 			},
-		).then(response => {
-			this._userkey = response.userkey
-		})
+		).then(response => response.userkey)
 		//TODO: handle error
+	}
+	private relogin() {
+		return this.getUserKey().then(x => {
+			this._userkey = x
+		})
 	}
 
 	set requestOptions(requestOptions: IRequestOptions) {

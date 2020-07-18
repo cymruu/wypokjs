@@ -16,7 +16,7 @@ describe('wykop client tests', () => {
 			.persist()
 		const realWykop = createTestWrapper(testConfig)
 		const client = new Client(realWykop, { username: 'test', accountkey: 'accountkey', userkey: 'any' })
-		await client.getUserKey()
+		await client['relogin']()
 		expect(client['_userkey']).toEqual('userkey123')
 	})
 	it('should not call getUserKey on init if userkey was provided', () => {

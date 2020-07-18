@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios'
+import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios'
 import { createHash } from 'crypto'
 import querystring from 'querystring'
 import { IWykopResponse, IWykopError } from './models/WykopResponse'
@@ -27,7 +27,7 @@ const emptyRequestParmas: IRequestParams = {
 	postParams: undefined,
 }
 export const defaultClientConfig = {
-	userAgent: 'wypokJS/0.1.2',
+	userAgent: 'wypokJS/0.1.6',
 	host: 'a2.wykop.pl',
 	timeout: 5000,
 }
@@ -95,20 +95,25 @@ export class Wykop {
 			this.makeRequest(endpoint, params, requestOptions).then(
 				(response: AxiosResponse<IWykopResponse<T>>) => {
 					if (response.data.error) {
-						return reject(new WykopError(response.data.error, response.request))
+						return reject(new WykopError(response.status, response.data.error))
 					}
 					resolve(response.data.data)
 				},
-			).catch(error => reject(error))
+			).catch((error: AxiosError<IWykopResponse<T>>) => {
+				if (error.response.data.error) {
+					reject(new WykopError(error.response.status, error.response.data.error))
+				}
+				return reject(error)
+			})
 		})
 	}
 }
 export class WykopError extends Error {
-	constructor(private errorObject: IWykopError, public request: any) {
+	constructor(public httpStatus: number, private errorObject: IWykopError) {
 		super()
 		this.name = 'WykopAPIError'
 	}
 	toString() {
-		return `${this.name} [${this.errorObject.code}] ${this.errorObject.message_en}`
+		return `[${this.httpStatus}] ${this.name} [${this.errorObject.code}] ${this.errorObject.message_en}`
 	}
 }
