@@ -1,50 +1,54 @@
 import { Client } from './client'
-import { Wykop } from './wykop'
+import { Wykop, IRequestParams } from './wykop'
 import { CommentUpvoter } from './models/Upvoter'
 import { Entry, EntryComment } from './models/Entry'
 
 class WykopApiService {
+	protected endpoint: string
 	constructor(protected ctx: Wykop | Client) { }
+
+	request<T>(method: string, params: IRequestParams) {
+		return this.ctx.request<T>(`${this.endpoint}/${method}`, params)
+	}
 }
 
 class EntriesService extends WykopApiService {
-	private endpoint = 'entries'
+	protected endpoint = 'entries'
 	Entry(entryId: string | number) {
-		return this.ctx.request<Entry>(`${this.endpoint}/entry`, { apiParam: entryId.toString() })
+		return this.request<Entry>('entry', { apiParam: entryId.toString() })
 	}
 	Add({ body, embed = undefined, adultmedia = false }: { body: string; embed?: string; adultmedia?: boolean }) {
-		return this.ctx.request<Entry>(`${this.endpoint}/add`, { postParams: { body, embed, adultmedia } })
+		return this.request<Entry>('add', { postParams: { body, embed, adultmedia } })
 	}
 	Delete(entryId: string | number) {
-		return this.ctx.request<Entry>(`${this.endpoint}/delete`, { apiParam: entryId.toString() })
+		return this.request<Entry>('delete', { apiParam: entryId.toString() })
 	}
 	Comment(commentId: string | number) {
-		return this.ctx.request<EntryComment>(`${this.endpoint}/comment`, { apiParam: commentId.toString() })
+		return this.request<EntryComment>('comment', { apiParam: commentId.toString() })
 	}
-	CommentAdd(
-		entryId: string | number,
+	CommentAdd(entryId: string | number,
 		{ body, embed = undefined, adultmedia = false }: { body: string; embed?: string; adultmedia?: boolean },
 	) {
-		return this.ctx.request<EntryComment>(
-			`${this.endpoint}/commentadd`, { apiParam: entryId.toString(), postParams: { body, embed, adultmedia } },
+		return this.request<EntryComment>(
+			'commentadd', { apiParam: entryId.toString(), postParams: { body, embed, adultmedia } },
 		)
 	}
 	CommentUpvoters(entryCommentId: string | number) {
-		return this.ctx.request<CommentUpvoter[]>(
-			`${this.endpoint}/commentupvoters`,
+		return this.request<CommentUpvoter[]>(
+			'commentupvoters',
 			{ apiParam: entryCommentId.toString() },
 		)
 	}
 	CommentDelete(entryCommentId: string | number) {
-		return this.ctx.request<EntryComment>(`${this.endpoint}/commentdelete`, { apiParam: entryCommentId.toString() })
+		return this.request<EntryComment>('commentdelete', { apiParam: entryCommentId.toString() })
 	}
 }
 
 class Pm extends WykopApiService {
-	private endpoint = 'pm'
+	protected endpoint = 'pm'
 	//TODO: embed param
 	SendMessage(receiver: string, body: string) {
-		return this.ctx.request<any>(`${this.endpoint}/sendmessage`, { apiParam: receiver, postParams: { body } })
+		return this.request<any>('sendmessage', { apiParam: receiver, postParams: { body } })
 	}
 }
 
