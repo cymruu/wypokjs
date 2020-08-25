@@ -41,7 +41,7 @@ export class Client {
 					password: this._config.password,
 				},
 			},
-		).then(response => response.userkey)
+		).then(response => response.data.userkey)
 	}
 
 	public relogin() {

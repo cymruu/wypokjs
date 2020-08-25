@@ -93,15 +93,15 @@ export class Wykop {
 		})
 	}
 	public async request<T>(endpoint: string, params: IRequestParams = {}, requestOptions?: IRequestOptions) {
-		return new Promise<T>((resolve, reject) => {
-			this.makeRequest(endpoint, params, requestOptions).then(
+		return new Promise<IWykopResponse<T>>((resolve, reject) => {
+			return this.makeRequest(endpoint, params, requestOptions).then(
 				(response: AxiosResponse<IWykopResponse<T>>) => {
 					if (response.data.error) {
 						return reject({ response })
 					}
-					resolve(response.data.data)
+					resolve(response.data)
 				},
-			)
+			).catch(err => reject(err))
 		}).catch((error: AxiosError<IWykopResponse<T>>) => {
 			let errorObject: AxiosError | WykopError = error
 			if (error.response.data.error) {

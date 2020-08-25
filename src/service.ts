@@ -9,6 +9,7 @@ class WykopApiService {
 
 	request<T>(method: string, params: IRequestParams) {
 		return this.ctx.request<T>(`${this.endpoint}/${method}`, params)
+			.then(response => response.data)
 	}
 }
 
