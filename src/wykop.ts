@@ -113,7 +113,7 @@ export class Wykop {
 	}
 }
 export class WykopError extends Error {
-	constructor(public httpStatus: number, private errorObject: IWykopError) {
+	constructor(public httpStatus: number, public errorObject: IWykopError) {
 		super()
 		this.name = 'WykopAPIError'
 	}
