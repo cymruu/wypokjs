@@ -45,7 +45,7 @@ class EntriesService extends WykopApiService {
 	}
 }
 
-class Pm extends WykopApiService {
+class PmService extends WykopApiService {
 	protected endpoint = 'pm'
 	//TODO: embed param
 	SendMessage(receiver: string, body: string) {
@@ -53,10 +53,9 @@ class Pm extends WykopApiService {
 	}
 }
 
-
 export function CreateWykopService(ctx: Wykop | Client) {
 	return {
 		Entries: new EntriesService(ctx),
-		Pm: new Pm(ctx),
+		Pm: new PmService(ctx),
 	}
 }

@@ -7,6 +7,9 @@ interface IClientConfig {
 	userkey?: string
 	password?: string //only allowed on apikeys for iOS, android app, OWM app
 }
+
+const EXPIRED_USERKEY_CODE = 7
+
 export class Client {
 	private _userkey: string
 	private _requestOptions: IRequestOptions
@@ -23,7 +26,7 @@ export class Client {
 
 		return this._ctx.request<T>(endpoint, params, { ...this._requestOptions, ...requestOptions })
 			.catch((err: WykopError) => {
-				if (err.httpStatus === 401) {
+				if (err.httpStatus === 401 || err.errorObject.code === EXPIRED_USERKEY_CODE) {
 					this.relogin()
 				}
 				throw err

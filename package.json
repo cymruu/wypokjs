@@ -1,6 +1,6 @@
 {
   "name": "wypokjs",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "Wykop V2 API wrapper",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,7 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.19.2"
+    "axios": "^0.21.1"
   },
   "devDependencies": {
     "@babel/core": "^7.10.1",
