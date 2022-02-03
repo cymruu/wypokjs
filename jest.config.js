@@ -2,7 +2,7 @@ module.exports = {
 	clearMocks: true,
 	coverageDirectory: 'coverage',
 	coveragePathIgnorePatterns: [
-		'/node_modules/'
+		'/node_modules/',
 	],
 	testEnvironment: 'node',
 	modulePaths: ['<rootDir>'],
