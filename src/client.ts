@@ -18,7 +18,7 @@ const EXPIRED_USERKEY_CODE = 7
 export class Client {
 	private _userkey: string
 	private _requestOptions: IRequestOptions
-	constructor(private _ctx: Wykop, private _config: ClientConfig) {
+	constructor(private _ctx: Wykop, private _config: Partial<ClientConfig>) {
 		this._userkey = this._config.userkey
 		if (!this._userkey) {
 			this.relogin()
@@ -44,8 +44,8 @@ export class Client {
 			{
 				postParams:
 				{
-					login: this._config.username,
 					accountkey: this._config.accountkey,
+					login: this._config.username,
 					password: this._config.password,
 				},
 			},
