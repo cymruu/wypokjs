@@ -15,6 +15,7 @@
         "baseUrl": "./",
         "esModuleInterop": true,
     },
+    "declaration": true,
     "include": [
         "src/**/*"
     ],

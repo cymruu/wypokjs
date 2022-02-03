@@ -1,11 +1,12 @@
 {
   "name": "wypokjs",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "description": "Wykop V2 API wrapper",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "npx typescript --declaration",
+    "build": "npx typescript",
+    "prepublish": "npm run build",
     "lint": "npx eslint . --ext .ts",
     "lint-fix": "npx eslint . --ext .ts --fix",
     "test": "npx jest",
