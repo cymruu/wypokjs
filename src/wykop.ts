@@ -32,7 +32,7 @@ export const defaultClientConfig = {
 	timeout: 5000,
 }
 
-type errorInterceptor = (error: WykopError | AxiosError) => typeof error
+export type errorInterceptor = (error: WykopError | AxiosError) => typeof error
 
 export class Wykop {
 	private config: IWykopConfig
