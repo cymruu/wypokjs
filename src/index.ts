@@ -1,5 +1,4 @@
-import { Wykop } from './wykop'
-import { Client } from './client'
-import { CreateWykopService } from './service'
+export * from './wykop'
+export * from './client'
+export * from './service'
 
-export { Wykop, Client, CreateWykopService }

@@ -14,8 +14,8 @@
         "outDir": "dist",
         "baseUrl": "./",
         "esModuleInterop": true,
+        "declaration": true,
     },
-    "declaration": true,
     "include": [
         "src/**/*"
     ],
