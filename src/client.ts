@@ -1,11 +1,16 @@
 import { Wykop, IRequestParams, IRequestOptions, WykopError } from './wykop'
 import { LoginResponse } from './models/LoginResponse'
 
-interface IClientConfig {
+type ClientConfig = (IPasswordClient & IAPIClient) & { userkey?: string }
+
+//only allowed on API keys for iOS, android app, OWM app
+interface IPasswordClient {
 	username: string
+	password: string
+}
+
+interface IAPIClient {
 	accountkey: string
-	userkey?: string
-	password?: string //only allowed on apikeys for iOS, android app, OWM app
 }
 
 const EXPIRED_USERKEY_CODE = 7
@@ -13,7 +18,7 @@ const EXPIRED_USERKEY_CODE = 7
 export class Client {
 	private _userkey: string
 	private _requestOptions: IRequestOptions
-	constructor(private _ctx: Wykop, private _config: IClientConfig) {
+	constructor(private _ctx: Wykop, private _config: ClientConfig) {
 		this._userkey = this._config.userkey
 		if (!this._userkey) {
 			this.relogin()
