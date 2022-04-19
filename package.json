@@ -1,6 +1,6 @@
 {
   "name": "wypokjs",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "description": "Wykop V2 API wrapper",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
