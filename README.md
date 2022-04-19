@@ -1,16 +1,6 @@
-# WykopJS - Wykop API v2 wrapper 
+# WykopJS - Wykop API v2 client 
 
-Wykop API v2 wrapper written in TypeScript.
-
-
-### Prerequisites
-
-This package requires those packages installed:
-
-Dependencies:
-```
-axios
-```
+Wykop API v2 client written in TypeScript.
 
 ### Installing
 
@@ -39,7 +29,7 @@ npm run test
 
 ### Contributing
 
-Contributing is very welcomed, please run linter before creating pull request. 
+Contributing is very welcomed, please fix all linter errors before creating pull request. 
 
 ```
 npm run lint-fix
